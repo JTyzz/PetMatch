@@ -8,13 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import com.bumptech.glide.Glide
 
 import com.example.petmatch.R
 import com.example.petmatch.interfaces.MatchCallback
-import com.example.petmatch.utilities.DATA_ANIMALS
-import com.example.petmatch.utilities.DATA_EMAIL
-import com.example.petmatch.utilities.DATA_NAME
-import com.example.petmatch.utilities.User
+import com.example.petmatch.utilities.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -51,6 +49,8 @@ class ProfileFragment : Fragment() {
 
         populateInfo()
 
+        user_photo_iv.setOnClickListener{ callback?.startActivityForPhoto()}
+
         applyButton.setOnClickListener { onApply() }
 
     }
@@ -71,6 +71,9 @@ class ProfileFragment : Fragment() {
                         radio_dog.isChecked = true
                     } else {
                         radio_cat.isChecked = true
+                    }
+                    if (user?.imageUrl!!.isNotEmpty()){
+                        populateImage(user.imageUrl)
                     }
                     pb_layout.visibility = View.GONE
                 }
@@ -95,5 +98,13 @@ class ProfileFragment : Fragment() {
             callback?.profileComplete()
         }
 
+    }
+    fun updateImageUri(uri: String) {
+        userDb.child(DATA_IMAGE_URL).setValue(uri)
+        populateImage(uri)
+    }
+
+    fun populateImage(uri: String){
+        Glide.with(this).load(uri).into(user_photo_iv)
     }
 }

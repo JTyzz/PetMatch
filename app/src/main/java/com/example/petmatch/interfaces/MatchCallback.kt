@@ -7,4 +7,5 @@ interface MatchCallback {
     fun onGetUserId(): String
     fun getUserDb(): DatabaseReference
     fun profileComplete()
+    fun startActivityForPhoto()
 }
