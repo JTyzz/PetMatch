@@ -6,10 +6,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 
 import com.example.petmatch.R
 import com.example.petmatch.interfaces.MatchCallback
+import com.example.petmatch.utilities.DATA_ANIMALS
+import com.example.petmatch.utilities.DATA_EMAIL
+import com.example.petmatch.utilities.DATA_NAME
+import com.example.petmatch.utilities.User
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
+import kotlinx.android.synthetic.main.fragment_profile.*
 
 class ProfileFragment : Fragment() {
 
@@ -17,10 +27,12 @@ class ProfileFragment : Fragment() {
     private lateinit var userDb: DatabaseReference
     private var callback: MatchCallback? = null
 
-    fun setCallback(callback: MatchCallback){
+    fun setCallback(callback: MatchCallback) {
         this.callback = callback
-    }
+        userId = callback.onGetUserId()
+        userDb = callback.getUserDb().child(userId)
 
+    }
 
 
     override fun onCreateView(
@@ -29,6 +41,59 @@ class ProfileFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile, container, false)
+
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        pb_layout.setOnTouchListener { view, event -> true }
+
+        populateInfo()
+
+        applyButton.setOnClickListener { onApply() }
+
+    }
+
+    fun populateInfo() {
+        pb_layout.visibility = View.VISIBLE
+        userDb.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                pb_layout.visibility = View.GONE
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                if (isAdded) {
+                    val user = p0.getValue(User::class.java)
+                    nameET.setText(user?.name, TextView.BufferType.EDITABLE)
+                    emailET.setText(user?.email, TextView.BufferType.EDITABLE)
+                    if (user?.animals == "dog") {
+                        radio_dog.isChecked = true
+                    } else {
+                        radio_cat.isChecked = true
+                    }
+                    pb_layout.visibility = View.GONE
+                }
+            }
+
+        })
+    }
+
+    fun onApply() {
+        val name = nameET.text.toString()
+        val email = emailET.text.toString()
+        val animalPreference = if (radio_dog.isChecked) "dog"
+                                                   else "cat"
+
+        if (nameET.text.toString().isNullOrEmpty()) {
+            Toast.makeText(context, "Please enter your name.", Toast.LENGTH_SHORT)
+        } else {
+            userDb.child(DATA_NAME).setValue(name)
+            userDb.child(DATA_EMAIL).setValue(email)
+            userDb.child(DATA_ANIMALS).setValue(animalPreference)
+
+            callback?.profileComplete()
+        }
+
+    }
 }

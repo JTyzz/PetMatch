@@ -115,6 +115,10 @@ class MatchActivity : AppCompatActivity(), MatchCallback {
 
     override fun getUserDb(): DatabaseReference = userDb
 
+    override fun profileComplete() {
+        matchTab?.select()
+    }
+
     companion object {
         fun mainIntent(context: Context?) = Intent(context, MatchActivity::class.java)
     }

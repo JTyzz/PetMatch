@@ -6,4 +6,5 @@ interface MatchCallback {
     fun onSignout()
     fun onGetUserId(): String
     fun getUserDb(): DatabaseReference
+    fun profileComplete()
 }
