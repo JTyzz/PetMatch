@@ -8,9 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.example.petmatch.R
+import com.example.petmatch.interfaces.MatchCallback
+import com.google.firebase.database.DatabaseReference
 
 
 class MatchFragment : Fragment() {
+
+    private lateinit var userId: String
+    private lateinit var userDb: DatabaseReference
+    private var callback: MatchCallback? = null
+
+    fun setCallback(callback: MatchCallback){
+        this.callback = callback
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
