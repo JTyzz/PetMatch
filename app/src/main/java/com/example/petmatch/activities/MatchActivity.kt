@@ -17,6 +17,7 @@ import com.example.petmatch.fragments.ConnectionsFragment
 import com.example.petmatch.fragments.MatchFragment
 import com.example.petmatch.fragments.ProfileFragment
 import com.example.petmatch.interfaces.MatchCallback
+import com.example.petmatch.utilities.DATA_CHATS
 import com.example.petmatch.utilities.DATA_USERS
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
@@ -35,6 +36,7 @@ class MatchActivity : AppCompatActivity(), MatchCallback {
     private val userId = firebaseAuth.currentUser?.uid
 
     private lateinit var userDb: DatabaseReference
+    private lateinit var chatDb: DatabaseReference
 
     private var profileFragment: ProfileFragment? = null
     private var matchFragment: MatchFragment? = null
@@ -58,6 +60,7 @@ class MatchActivity : AppCompatActivity(), MatchCallback {
         }
 
         userDb = FirebaseDatabase.getInstance().reference.child(DATA_USERS)
+        chatDb = FirebaseDatabase.getInstance().reference.child(DATA_CHATS)
 
         profileTab = nav_tabs.newTab()
         matchTab = nav_tabs.newTab()
@@ -160,6 +163,8 @@ class MatchActivity : AppCompatActivity(), MatchCallback {
     override fun onGetUserId(): String = userId!!
 
     override fun getUserDb(): DatabaseReference = userDb
+
+    override fun getChatDb(): DatabaseReference = chatDb
 
     override fun profileComplete() {
         matchTab?.select()
